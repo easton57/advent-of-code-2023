@@ -14,7 +14,6 @@ def main():
     sum = 0
 
     # doesn't specify if we need to consider numbers spelled out so starting just with integers and a horrible nested for loop
-    # Update, it needs the dumb string numbers
     for i in prompt_data:
         line_nums = []
         new_word = ""
