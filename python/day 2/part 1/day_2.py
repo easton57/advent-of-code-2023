@@ -10,7 +10,7 @@ def main():
     max_values = {'red': 12, 'green': 13, 'blue': 14}
 
     # Read our input
-    with open("input.txt") as i:
+    with open("../input.txt") as i:
         lines = i.readlines()
 
     # Find what's possible
