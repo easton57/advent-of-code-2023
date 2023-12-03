@@ -47,22 +47,42 @@ def main():
                     new_word = ""
 
             reverse_str = ""
-            reverse_num = None
+            reverse_num = []
 
             # Check the string backwards
             for j in reversed(i):
-                reverse_str = j + reverse_str
+                # get the nums
+                try:
+                    int(j)
+
+                    # append the number
+                    reverse_num = [j] + reverse_num
+                    reverse_str = ""
+                except:
+                    # try to construct a word
+                    reverse_str = j + reverse_str
+
+                # Check the word
+                if reverse_str in num_dict:
+                    int(num_dict.get(reverse_str))
+
+                    # append the num
+                    reverse_num = [str(num_dict.get(reverse_str))] + reverse_num
+                    reverse_str = ""
+
+                # Check to see if a key is contained in the string
                 contained, returned_num = contains_num(reverse_str, num_dict)
 
-                if contained and reverse_str != i:
-                    reverse_num = num_dict.get(returned_num)
-                    break
+                if contained:
+                    reverse_num = [str(num_dict.get(returned_num))] + reverse_num
+                    reverse_str = ""
 
-            if line_nums[-1] != reverse_num:
-                line_nums[-1] = reverse_num
-
-            sum += int(line_nums[0] + line_nums[-1])
-            final_nums.append(int(line_nums[0] + line_nums[-1]))
+            if reverse_num[-1] != line_nums[-1] and reverse_num[-1] is not None:
+                sum += int(line_nums[0] + reverse_num[-1])
+                final_nums.append(int(line_nums[0] + reverse_num[-1]))
+            else:
+                sum += int(line_nums[0] + line_nums[-1])
+                final_nums.append(int(line_nums[0] + line_nums[-1]))
 
     with open("day_1_2_output.txt", "w") as f:
         f.write(str(sum))
