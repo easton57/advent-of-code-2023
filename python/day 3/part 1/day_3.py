@@ -3,10 +3,16 @@ Day 3 advent of code
 by: Easton Seidel
 """
 
+sum = 0
+lines = None
+line_blacklist = []
+
 
 def main():
+    global sum
+    global lines
+    global line_blacklist
     int_strings = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
-    sum = 0
 
     # Read our input
     with open("../input.txt") as i:
@@ -15,9 +21,9 @@ def main():
     # Loop through the range of the lines
     for i in range(len(lines)):
         # Pull current line stats
+        print(f"\nCurrent working line: {lines[i]}")
         curr_line_nums = find_indexes(lines[i], int_strings)
         curr_line_chars = find_indexes(lines[i], int_strings, True)
-        line_blacklist = []
 
         # Find out if we're on the first line, last line, or somewhere inbetween
         if i == 0:  # First Line
@@ -25,52 +31,22 @@ def main():
 
             # Check to see if any are close
             for j in curr_line_nums:
-                j_2 = j + 1  # i with a plus 1
-                j_3 = j - 1  # i with a minus 1
-
                 # current line
-                if j in curr_line_chars or j_2 in curr_line_chars or j_3 in curr_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(curr_line_chars, curr_line_nums, j, lines, i)
 
                 # next line
-                if j in next_line_chars or j_2 in next_line_chars or j_3 in next_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(next_line_chars, curr_line_nums, j, lines, i)
 
         elif i == len(lines) - 1:  # Last Line
             prev_line_chars = find_indexes(lines[i - 1], int_strings, True)
 
             # Check to see if any are close
             for j in curr_line_nums:
-                j_2 = j + 1  # i with a plus 1
-                j_3 = j - 1  # i with a minus 1
-
                 # current line
-                if j in curr_line_chars or j_2 in curr_line_chars or j_3 in curr_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(curr_line_chars, curr_line_nums, j, lines, i)
 
                 # prev line
-                if j in prev_line_chars or j_2 in prev_line_chars or j_3 in prev_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(prev_line_chars, curr_line_nums, j, lines, i)
 
         else:  # Everything else
             next_line_chars = find_indexes(lines[i + 1], int_strings, True)
@@ -78,39 +54,47 @@ def main():
 
             # Check to see if any are close
             for j in curr_line_nums:
-                j_2 = j + 1  # i with a plus 1
-                j_3 = j - 1  # i with a minus 1
-
                 # current line
-                if j in curr_line_chars or j_2 in curr_line_chars or j_3 in curr_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(curr_line_chars, curr_line_nums, j, lines, i)
 
                 # next line
-                if j in next_line_chars or j_2 in next_line_chars or j_3 in next_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(next_line_chars, curr_line_nums, j, lines, i)
 
                 # prev line
-                if j in prev_line_chars or j_2 in prev_line_chars or j_3 in prev_line_chars:
-                    s, e = construct_num(curr_line_nums, j)
-
-                    # Get the number that's good and add it to the sum
-                    if lines[i][s:e] not in line_blacklist:
-                        sum += int(lines[i][s:e])
-                        line_blacklist.append(lines[i][s:e])
+                check_valid_num(prev_line_chars, curr_line_nums, j, lines, i)
 
     # Write the answer out to a file
     with open("day_3_output.txt", "w") as o:
+        print(f"\nFinal sum: {sum}")
         o.write(str(sum))
+
+
+def check_valid_num(line_chars, line_nums, num, lines, i) -> None:
+    """ Checks a found number to the listed simbols to validate them """
+    global sum
+    global line_blacklist
+
+    num_2 = num + 1  # i with a plus 1
+    num_3 = num - 1  # i with a minus 1
+
+    if num in line_chars or num_2 in line_chars or num_3 in line_chars:
+        s, e = construct_num(line_nums, num)
+        new_num = lines[i][s:e]
+
+        try:
+            # Add the number to the sum
+            sum += int(new_num)
+
+            # remove the number from the line string
+            lines[i] = lines[i].split(new_num, 1)
+
+            # Create a solid string again
+            fill = "." * len(new_num)
+            lines[i] = fill.join(lines[i])
+
+            print(f"Number used: {new_num} and new sum: {sum}")
+        except ValueError:
+            print("Number previously accounted for... continuing...")
 
 
 def find_indexes(search_list, target, avoid=False) -> list:
@@ -148,7 +132,7 @@ def construct_num(idxs, hit_idx) -> [int, int]:
         ending_num = hit_idx
 
         # check for third num behind the second
-        if idxs[start - 2] == hit_idx - 2:
+        if start - 2 < len(idxs) and idxs[start - 2] == hit_idx - 2:
             starting_num = hit_idx - 2
         else:
             starting_num = hit_idx - 1
@@ -156,7 +140,7 @@ def construct_num(idxs, hit_idx) -> [int, int]:
         starting_num = hit_idx
 
         # check for third num behind the second
-        if hit_idx and idxs[start + 2] == hit_idx + 2:
+        if start + 2 < len(idxs) and idxs[start + 2] == hit_idx + 2:
             ending_num = hit_idx + 2
         else:
             ending_num = hit_idx + 1
