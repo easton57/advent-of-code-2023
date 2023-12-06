@@ -21,7 +21,7 @@ def main():
     # Loop through the range of the lines
     for i in range(len(lines)):
         # Pull current line stats
-        print(f"\nCurrent working line: {lines[i]}")
+        print(f"\nStep {i + 1}\nCurrent working line: {lines[i]}")
         curr_line_nums = find_indexes(lines[i], int_strings)
         curr_line_chars = find_indexes(lines[i], int_strings, True)
 
@@ -125,25 +125,40 @@ def construct_num(idxs, hit_idx) -> [int, int]:
     # find out what direction we need to go to create the slice
     start = idxs.index(hit_idx)
 
-    if idxs[start + 1] == hit_idx + 1 and hit_idx - 1 == idxs[start - 1]:
-        starting_num = hit_idx - 1
-        ending_num = hit_idx + 1
-    elif idxs[start + 1] > hit_idx + 1:
-        ending_num = hit_idx
-
-        # check for third num behind the second
-        if start - 2 < len(idxs) and idxs[start - 2] == hit_idx - 2:
-            starting_num = hit_idx - 2
-        else:
+    try:
+        if start != len(idxs) - 1 and hit_idx - idxs[start - 1] != 1 != idxs[start + 1] - hit_idx:
+            starting_num = hit_idx
+            ending_num = hit_idx
+        elif start != len(idxs) - 1 and idxs[start + 1] == hit_idx + 1 and hit_idx - 1 == idxs[start - 1]:
             starting_num = hit_idx - 1
-    elif idxs[start - 1] < hit_idx - 1:
-        starting_num = hit_idx
-
-        # check for third num behind the second
-        if start + 2 < len(idxs) and idxs[start + 2] == hit_idx + 2:
-            ending_num = hit_idx + 2
-        else:
             ending_num = hit_idx + 1
+        elif start != len(idxs) - 1 and idxs[start + 1] > hit_idx + 1:
+            ending_num = hit_idx
+
+            # check for third num behind the second
+            if start - 2 < len(idxs) and idxs[start - 2] == hit_idx - 2:
+                starting_num = hit_idx - 2
+            else:
+                starting_num = hit_idx - 1
+        elif start == len(idxs) - 1:
+            ending_num = hit_idx
+
+            # check for third num behind the second
+            if start - 2 < len(idxs) and idxs[start - 2] == hit_idx - 2:
+                starting_num = hit_idx - 2
+            else:
+                starting_num = hit_idx - 1
+        elif idxs[start - 1] < hit_idx - 1 or start == 0:
+            starting_num = hit_idx
+
+            # check for third num behind the second
+            if start + 2 < len(idxs) and idxs[start + 2] == hit_idx + 2:
+                ending_num = hit_idx + 2
+            else:
+                ending_num = hit_idx + 1
+    except IndexError:
+        print(f"IndexError! start: {start}, idxs: {idxs}, length of idxs: {len(idxs)}")
+        exit(-1)
 
     return starting_num, ending_num + 1
 
